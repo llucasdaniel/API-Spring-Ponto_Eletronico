@@ -12,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
@@ -69,7 +70,7 @@ public class Empresa implements Serializable {
 	}
 	
 	@Column(name="date_update",nullable=false)
-	public Date getDateUpadate() {
+	public Date getDateUpdate() {
 		return this.dateUpdate;
 	}
 	
@@ -81,6 +82,10 @@ public class Empresa implements Serializable {
 	public List<Funcionario> getFuncionarios() {
 		return funcionarios;
 	}
+	
+	public void setFuncionarios(List<Funcionario> funcionarios) {
+		this.funcionarios = funcionarios;
+	}
 
 	public void setLancamentos(List<Funcionario> funcionarios) {
 		this.funcionarios = funcionarios;
@@ -91,7 +96,7 @@ public class Empresa implements Serializable {
 		dateUpdate = new Date();
 	}
 	
-	@PreUpdate
+	@PrePersist
 	public void prePersist() {
 		final Date atual = new Date();
 		dateCreation = atual;
