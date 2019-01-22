@@ -1,6 +1,12 @@
 package com.lucas.pontoeletronico.api.repositories;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import java.util.Optional;
 
 import org.junit.After;
 import org.junit.Before;
@@ -18,7 +24,7 @@ import com.lucas.pontoeletronico.api.entities.Empresa;
 @ActiveProfiles("test")
 public class EmpresaRepositoryTests {
 
-	@Autowired
+	@Autowired		
 	private EmpresaRepository empresaRepository;
 	
 	private static final String CNPJ = "54053474000120";
@@ -41,6 +47,14 @@ public class EmpresaRepositoryTests {
 		Empresa emp = this.empresaRepository.findByCnpj(CNPJ);
 		
 		assertEquals(CNPJ, emp.getCnpj());
+	}
+	
+	@Test
+	public void testFindById() {
+		Long id = 11L;
+		Optional<Empresa> emp = this.empresaRepository.findById(id);
+		
+		assertEquals(id,  emp.get().getId());
 	}
 }
 
