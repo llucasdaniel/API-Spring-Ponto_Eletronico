@@ -82,8 +82,8 @@ public class FuncionarioServiceTest {
 
 	@Test
 	public void testAddFuncionario() {
-		Funcionario  emp = this.funcionarioService.add(new Funcionario());
-		assertEquals("func@FUNC.com", emp.getEmail());
+		Funcionario  func = this.funcionarioService.add(new Funcionario());
+		assertEquals("func@FUNC.com", func.getEmail());
 		verify(funcionarioRepository,Mockito.times(1)).save(Mockito.any(Funcionario.class));
 	}
 }
