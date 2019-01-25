@@ -33,7 +33,7 @@ public class Empresa implements Serializable {
 	}
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public Long getId() {
 		return id;
 	}
@@ -42,7 +42,7 @@ public class Empresa implements Serializable {
 		this.id = id;
 	}
 
-	@Column(name = "razao_soial", nullable = false)
+	@Column(name = "razao_social", nullable = false)
 	public String getRazaoSocial() {
 		return razaoSocial;
 	}
@@ -60,7 +60,7 @@ public class Empresa implements Serializable {
 		this.cnpj = cnpj;
 	}
 	
-	@Column(name = "date_Creation", nullable = false)
+	@Column(name = "data_criacao", nullable = false)
 	public Date getDateCreation() {
 		return dateCreation;
 	}
@@ -69,7 +69,7 @@ public class Empresa implements Serializable {
 		this.dateCreation = dateCreation;
 	}
 	
-	@Column(name="date_update",nullable=false)
+	@Column(name="data_atualizacao",nullable=false)
 	public Date getDateUpdate() {
 		return this.dateUpdate;
 	}
