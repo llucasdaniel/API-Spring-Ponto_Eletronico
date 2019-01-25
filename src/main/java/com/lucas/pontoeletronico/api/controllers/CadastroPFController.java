@@ -28,7 +28,7 @@ import com.lucas.pontoeletronico.api.services.FuncionarioService;
 import com.lucas.pontoeletronico.api.utils.PasswordUtils;
 
 @RestController
-@RequestMapping("/api/cadastrar-pj")
+@RequestMapping("/api/cadastrar-pf")
 @CrossOrigin(origins = "*")
 public class CadastroPFController {
 
