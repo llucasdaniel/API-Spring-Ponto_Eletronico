@@ -125,7 +125,7 @@ public class CadastroPFController {
 	 * @param funcionario
 	 * @return CadastroPFDto
 	 */
-	private CadastroPFDto converterCadastroPFDto(Funcionario funcionario) {
+	public CadastroPFDto converterCadastroPFDto(Funcionario funcionario) {
 		CadastroPFDto cadastroPFDto = new CadastroPFDto();
 		cadastroPFDto.setId(funcionario.getId());
 		cadastroPFDto.setNome(funcionario.getNome());
