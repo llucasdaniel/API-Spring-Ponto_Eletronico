@@ -1,6 +1,7 @@
 package com.lucas.pontoeletronico.api.controllers;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -36,7 +37,7 @@ public class CadastroPFControllerTest {
 	}
 	
 	@Test
-	public void converterCadastroPFDtoTest() {
+	public void converterCadastroPFDtoTest_OptionalPresent() {
 		CadastroPFController controller = new  CadastroPFController();
 		CadastroPFDto cad = controller.converterCadastroPFDto(this.func);
 	
@@ -50,5 +51,25 @@ public class CadastroPFControllerTest {
 		assertEquals("60",cad.getValorHora().get());
 		assertEquals(new Long(10),cad.getId());
 	}	
+	
+	@Test
+	public void converterCadastroPFDtoTest_OptionalNOTPresent() {
+		func.setQtdHorasAlmoco(null);
+		func.setQtdHorasTrabalhoDia(null);
+		func.setValorHora(null);
+		
+		CadastroPFController controller = new  CadastroPFController();
+		CadastroPFDto cad = controller.converterCadastroPFDto(this.func);
+	
+		assertEquals("Lucas D",cad.getNome());
+		assertEquals("lucas@123.com",cad.getEmail());
+		assertEquals("123456789009",cad.getCpf());
+		assertEquals("67134134000176",cad.getCnpj());
+		assertEquals(new Long(10),cad.getId());
+		
+		assertEquals(Optional.empty(),cad.getQtdHorasAlmoco());
+		assertEquals(Optional.empty(),cad.getQtdHorasTrabalhoDia());
+		assertEquals(Optional.empty(),cad.getValorHora());
+	}
 		
 }
