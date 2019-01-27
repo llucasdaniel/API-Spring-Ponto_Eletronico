@@ -104,8 +104,6 @@ public class CadastroPFControllerTest {
 		assertEquals("Lucas D",funcionario.getNome());
 		assertEquals("lucas@123.com",funcionario.getEmail());
 		assertEquals("123456789009",funcionario.getCpf());
-		
-		assertEquals(PasswordUtils.generateBCrypt(cadastroPFDto.getSenha()),funcionario.getSenha());
 		assertEquals(PerfilEnum.ROLE_USUARIO,funcionario.getPerfil());
 		
 		
