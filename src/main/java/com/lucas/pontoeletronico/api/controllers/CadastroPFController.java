@@ -103,7 +103,7 @@ public class CadastroPFController {
 	 * @return Funcionario
 	 * @throws NoSuchAlgorithmException
 	 */
-	private Funcionario converterDtoParaFuncionario(CadastroPFDto cadastroPFDto, BindingResult result)
+	public Funcionario converterDtoParaFuncionario(CadastroPFDto cadastroPFDto, BindingResult result)
 			throws NoSuchAlgorithmException {
 		Funcionario funcionario = new Funcionario();
 		funcionario.setNome(cadastroPFDto.getNome());
