@@ -1,15 +1,17 @@
 package com.lucas.pontoeletronico.api.controllers;
 
-import java.math.BigDecimal;
+import static org.junit.Assert.assertEquals;
 
-import org.junit.Assert;
+import java.math.BigDecimal;
+import java.util.Optional;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import com.lucas.pontoeletronico.api.dtos.CadastroPFDto;
 import com.lucas.pontoeletronico.api.entities.Empresa;
 import com.lucas.pontoeletronico.api.entities.Funcionario;
-import static org.junit.Assert.*;
+//import static org.junit.Assert.;
 
 public class CadastroPFControllerTest {
 
@@ -22,7 +24,7 @@ public class CadastroPFControllerTest {
 		emp = new Empresa();
 		emp.setCnpj("67134134000176");
 		
-		Funcionario func = new Funcionario();
+		func = new Funcionario();
 		func.setId(10L);
 		func.setNome("Lucas D");
 		func.setEmail("lucas@123.com");
@@ -36,12 +38,17 @@ public class CadastroPFControllerTest {
 	@Test
 	public void converterCadastroPFDtoTest() {
 		CadastroPFController controller = new  CadastroPFController();
-		CadastroPFDto cad = controller.converterCadastroPFDto(func);
+		CadastroPFDto cad = controller.converterCadastroPFDto(this.func);
 	
 		assertEquals("Lucas D",cad.getNome());
 		assertEquals("lucas@123.com",cad.getEmail());
 		assertEquals("123456789009",cad.getCpf());
 		assertEquals("67134134000176",cad.getCnpj());
-	}
+		
+		assertEquals("1.0",cad.getQtdHorasAlmoco().get());
+		assertEquals("8.0",cad.getQtdHorasTrabalhoDia().get());
+		assertEquals("60",cad.getValorHora().get());
+		assertEquals(new Long(10),cad.getId());
+	}	
 		
 }
