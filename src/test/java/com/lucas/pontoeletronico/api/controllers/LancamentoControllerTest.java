@@ -47,7 +47,7 @@ public class LancamentoControllerTest {
 	@MockBean
 	private FuncionarioService funcionarioService;
 	
-	private static final String URL = "/api/lancamentos/";
+	private static final String URL = "/api/lancamentos";
 	private static final Long ID_FUNCIONARIO = Long.valueOf(11);
 	private static final Long ID_LANCAMENTO = Long.valueOf(2);
 	private static final String TIPO  = TipoEnum.INICIO_TRABALHO.name();
@@ -77,6 +77,18 @@ public class LancamentoControllerTest {
 			 .andExpect(jsonPath("$.errors").isEmpty());
 			  
 	}	
+	
+	@Test
+	public void addLancamentosFuncionarioIdInvalido() throws JsonProcessingException, Exception {
+		BDDMockito.given(this.funcionarioService.buscarPorId(Mockito.anyLong())).willReturn(Optional.empty());
+		mvc.perform(MockMvcRequestBuilders.post(URL)
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(this.obterJsonRequisicaoPost()))
+		.andExpect(status().isBadRequest())
+		.andExpect(jsonPath("$.data").isEmpty())
+		.andExpect(jsonPath("$.errors").value("Funcionário não encontrado. ID inexistente."));
+	}
 	
 	private String obterJsonRequisicaoPost() throws JsonProcessingException {
 		LancamentoDto lancamentoDto = new LancamentoDto();
