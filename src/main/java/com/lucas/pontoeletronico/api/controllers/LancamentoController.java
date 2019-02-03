@@ -190,7 +190,7 @@ public class LancamentoController {
 	 */
 	private void validarFuncionario(LancamentoDto lancamentoDto, BindingResult result) {
 		if (lancamentoDto.getFuncionarioId() == null) {
-			result.addError(new ObjectError("funcionario", "Funcionário não informado."));
+			result.addError(new ObjectError("funcionario", "Funcionário não encontrado."));
 			return;
 		}
 
