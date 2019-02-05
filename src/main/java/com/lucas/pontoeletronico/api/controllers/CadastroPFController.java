@@ -13,12 +13,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lucas.pontoeletronico.api.dtos.CadastroPFDto;
+import com.lucas.pontoeletronico.api.dtos.EmpresaDto;
 import com.lucas.pontoeletronico.api.entities.Empresa;
 import com.lucas.pontoeletronico.api.entities.Funcionario;
 import com.lucas.pontoeletronico.api.enums.PerfilEnum;
@@ -43,6 +46,7 @@ public class CadastroPFController {
 	public CadastroPFController() {
 	}
 
+  
 	/**
 	 * Cadastra uma pessoa jurídica no sistema.
 	 * 
@@ -61,7 +65,7 @@ public class CadastroPFController {
 		Funcionario funcionario = this.converterDtoParaFuncionario(cadastroPFDto, result);
 
 		if (result.hasErrors()) {
-			log.error("Erro validando dados de cadastro PJ: {}", result.getAllErrors());
+			log.error("Erro validando dados de cadastro PF: {}", result.getAllErrors());
 			result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
 			return ResponseEntity.badRequest().body(response);
 		}
