@@ -99,7 +99,7 @@ public class CadastroPFControllerTest {
 	}
 
 	@Test 	 
-	public void cadastrarTest() throws Exception {
+	public void cadastrarTest_Invalid() throws Exception {
 		BDDMockito.given(this.empresaService.buscarPorCnpj(Mockito.anyString())).willReturn(Optional.empty());
 		BDDMockito.given(this.funcionarioService.buscarPorCPF(Mockito.anyString())).willReturn(Optional.of(new Funcionario()));
 		BDDMockito.given(this.funcionarioService.buscarPorEmail(Mockito.anyString())).willReturn(Optional.of(new Funcionario()));
@@ -110,11 +110,27 @@ public class CadastroPFControllerTest {
 		
 		mvc.perform(MockMvcRequestBuilders.post(URL).accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON).content(this.obterJsonRequisicaoPost()))
-		.andDo(print())
 		.andExpect(status().isBadRequest())
 		.andExpect(jsonPath("$.errors")
-				.value(lista))
-		;
+				.value(lista));
+	}
+	@Test 	 
+	public void cadastrarTest() throws Exception {
+		Funcionario func = new Funcionario();
+		
+		
+		BDDMockito.given(this.empresaService.buscarPorCnpj(Mockito.anyString())).willReturn(Optional.empty());
+		BDDMockito.given(this.funcionarioService.buscarPorCPF(Mockito.anyString())).willReturn(Optional.empty());
+		BDDMockito.given(this.funcionarioService.buscarPorEmail(Mockito.anyString())).willReturn(Optional.empty());
+		BDDMockito.given(this.empresaService.buscarPorCnpj(Mockito.anyString())).willReturn(Optional.of(new Empresa()));
+		BDDMockito.given(this.funcionarioService.add(Mockito.any())).willReturn(func);
+		
+		mvc.perform(MockMvcRequestBuilders.post(URL).accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON).content(this.obterJsonRequisicaoPost()))
+		.andExpect(status().isOk())
+		.andExpect(jsonPath("$.data.nome").value("Lucas D"))
+		.andExpect(jsonPath("$.data.email").value("lucas@123.com"))
+		.andExpect(jsonPath("$.data.cpf").value("12345678909")); 
 
 	}
 	
