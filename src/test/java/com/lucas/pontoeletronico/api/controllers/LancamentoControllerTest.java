@@ -61,6 +61,35 @@ public class LancamentoControllerTest {
 	private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	@Test
+	public void listarPorId_ExistLancamento() throws Exception {
+  
+		BDDMockito.given(this.lancamentoService.buscarPorId(Mockito.anyLong()))
+				.willReturn(Optional.of(obterDadosLancamento()));
+
+		mvc.perform(MockMvcRequestBuilders.get(URL + ID_LANCAMENTO)
+				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
+		.andExpect(jsonPath("$.data.id").value(ID_LANCAMENTO))
+		.andExpect(jsonPath("$.data.tipo").value(TIPO))
+		.andExpect(jsonPath("$.data.funcionarioId").value(ID_FUNCIONARIO))
+		.andExpect(jsonPath("$.errors").isEmpty())
+		.andExpect(status().isOk());
+	}
+	
+	@Test
+	public void listarPorId_NotPresent() throws Exception {
+  
+		BDDMockito.given(this.lancamentoService.buscarPorId(Mockito.anyLong()))
+				.willReturn(Optional.empty());
+
+		mvc.perform(MockMvcRequestBuilders.get(URL + ID_LANCAMENTO)
+				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
+		.andDo(print())
+		.andExpect(jsonPath("$.errors").value("Lançamento não encontrado para o id " + ID_LANCAMENTO))
+		.andExpect(jsonPath("$.data").isEmpty())
+		.andExpect(status().isBadRequest());
+	}
+	
+	@Test
 	public void listarPorFuncionarioId_PageZero_WithElements() throws Exception {
  
 		ArrayList<Lancamento> lancaments = new ArrayList<Lancamento>();
@@ -73,11 +102,12 @@ public class LancamentoControllerTest {
 
 		mvc.perform(MockMvcRequestBuilders.get(URL + "/funcionario/" + ID_FUNCIONARIO)
 				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.id").value(ID_LANCAMENTO))
-		.andExpect(jsonPath("$.data.tipo").value("INICIO_TRABALHO"))
-		.andExpect(jsonPath("$.data.funcionarioId").value(ID_FUNCIONARIO))
+		.andExpect(jsonPath("$.data.content[0].id").value(ID_LANCAMENTO))
+		.andExpect(jsonPath("$.data.content[0].tipo").value(TIPO))
+		.andExpect(jsonPath("$.data.content[0].funcionarioId").value(ID_FUNCIONARIO))
 		.andExpect(status().isOk());
 	}
+	
 	@Test
 	public void listarPorFuncionarioId_PageOne_WithNoElements() throws Exception {
  
