@@ -1,11 +1,12 @@
 package com.lucas.pontoeletronico.api.controllers;
 
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Optional;
 
@@ -17,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
@@ -58,28 +61,61 @@ public class LancamentoControllerTest {
 	private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	@Test
+	public void listarPorFuncionarioId_PageZero_WithElements() throws Exception {
+ 
+		ArrayList<Lancamento> lancaments = new ArrayList<Lancamento>();
+		lancaments.add(obterDadosLancamento());
+		
+		Page<Lancamento> pages =new PageImpl(lancaments); 
+ 
+		BDDMockito.given(this.lancamentoService.buscarPorFuncionarioId(Mockito.anyLong(), Mockito.any()))
+				.willReturn(pages);
+
+		mvc.perform(MockMvcRequestBuilders.get(URL + "/funcionario/" + ID_FUNCIONARIO)
+				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
+		.andExpect(jsonPath("$.data.id").value(ID_LANCAMENTO))
+		.andExpect(jsonPath("$.data.tipo").value("INICIO_TRABALHO"))
+		.andExpect(jsonPath("$.data.funcionarioId").value(ID_FUNCIONARIO))
+		.andExpect(status().isOk());
+	}
+	@Test
+	public void listarPorFuncionarioId_PageOne_WithNoElements() throws Exception {
+ 
+		ArrayList<Lancamento> lancaments = new ArrayList<Lancamento>();
+		lancaments.add(obterDadosLancamento());
+		
+		Page<Lancamento> pages = Mockito.mock(Page.class);
+ 
+		BDDMockito.given(this.lancamentoService.buscarPorFuncionarioId(Mockito.anyLong(), Mockito.any()))
+				.willReturn(pages);
+
+		mvc.perform(MockMvcRequestBuilders.get(URL + "/funcionario/" + ID_FUNCIONARIO + "?pag=1")
+				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
+		.andDo(print()) 
+		.andExpect(jsonPath("$.data").isEmpty()) 
+		.andExpect(status().isOk());
+	}
+
+	@Test
 	public void cadastrarLancamentoTest() throws Exception {
 
 		Lancamento lancamento = obterDadosLancamento();
 		Funcionario func = new Funcionario();
 		func.setCpf("12345678909");
-		BDDMockito.given(this.funcionarioService.buscarPorId(ID_FUNCIONARIO))
-				.willReturn(Optional.of(func));
+		BDDMockito.given(this.funcionarioService.buscarPorId(ID_FUNCIONARIO)).willReturn(Optional.of(func));
 		BDDMockito.given(this.lancamentoService.add(Mockito.any(Lancamento.class))).willReturn(lancamento);
 
 		mvc.perform(MockMvcRequestBuilders.post(URL).accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON).content(this.obterJsonRequisicaoPost()))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.data.id").value(ID_LANCAMENTO))
+				.andExpect(status().isOk()).andExpect(jsonPath("$.data.id").value(ID_LANCAMENTO))
 				.andExpect(jsonPath("$.data.tipo").value(TIPO))
 				.andExpect(jsonPath("$.data.data").value(this.dateFormat.format(DATA)))
 				.andExpect(jsonPath("$.data.funcionarioId").value(ID_FUNCIONARIO))
 				.andExpect(jsonPath("$.errors").isEmpty());
-		
-		
-		BDDMockito.verify(this.funcionarioService,times(1)).buscarPorId(ID_FUNCIONARIO);		
-		BDDMockito.verify(this.lancamentoService,times(1)).add(Mockito.any(Lancamento.class));
-		
+
+		BDDMockito.verify(this.funcionarioService, times(1)).buscarPorId(ID_FUNCIONARIO);
+		BDDMockito.verify(this.lancamentoService, times(1)).add(Mockito.any(Lancamento.class));
+
 	}
 
 	@Test
