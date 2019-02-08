@@ -61,6 +61,95 @@ public class LancamentoControllerTest {
 	private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	@Test
+	public void atualizarTest() throws Exception {
+  
+		BDDMockito.given(this.lancamentoService.add(Mockito.any())).willReturn(obterDadosLancamento());
+		BDDMockito.given(this.funcionarioService.buscarPorId(Mockito.any())).willReturn(Optional.of(new Funcionario()));
+		BDDMockito.given(this.lancamentoService.buscarPorId(Mockito.any())).willReturn(Optional.of(new Lancamento()));
+
+		mvc.perform(MockMvcRequestBuilders.put(URL + ID_LANCAMENTO)
+				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)
+				.content(obterJsonRequisicaoPost()))
+		.andDo(print())
+		.andExpect(jsonPath("$.data.id").value(ID_LANCAMENTO))
+		.andExpect(jsonPath("$.data.tipo").value(TIPO))
+		.andExpect(jsonPath("$.data.funcionarioId").value(ID_FUNCIONARIO))
+		.andExpect(jsonPath("$.errors").isEmpty())
+		.andExpect(status().isOk());
+	}
+	
+	@Test
+	public void atualizarTest_FuncionarioInvalido() throws Exception {
+		LancamentoDto lancamentoDto = new LancamentoDto();
+		lancamentoDto.setFuncionarioId(null);
+		lancamentoDto.setId(null);
+		lancamentoDto.setData(this.dateFormat.format(DATA));
+		lancamentoDto.setTipo(TIPO);
+		
+		ObjectMapper mapper = new ObjectMapper();
+		String put = mapper.writeValueAsString(lancamentoDto);
+		
+		BDDMockito.given(this.lancamentoService.add(Mockito.any())).willReturn(obterDadosLancamento());
+		BDDMockito.given(this.funcionarioService.buscarPorId(Mockito.any())).willReturn(Optional.empty());
+		BDDMockito.given(this.lancamentoService.buscarPorId(Mockito.any())).willReturn(Optional.of(new Lancamento()));
+
+		mvc.perform(MockMvcRequestBuilders.put(URL + 3)
+				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)
+				.content(put))
+		.andDo(print())
+		.andExpect(jsonPath("$.errors").value("Funcionário não encontrado."))
+		.andExpect(jsonPath("$.data").isEmpty())
+		.andExpect(status().isBadRequest());
+	}
+	
+	@Test
+	public void atualizarTest_FuncionarioInvalido_IdNaoExistente() throws Exception {
+		LancamentoDto lancamentoDto = new LancamentoDto();
+		lancamentoDto.setFuncionarioId(10L);
+		lancamentoDto.setId(null);
+		lancamentoDto.setData(this.dateFormat.format(DATA));
+		lancamentoDto.setTipo(TIPO);
+		
+		ObjectMapper mapper = new ObjectMapper();
+		String put = mapper.writeValueAsString(lancamentoDto);
+		
+		BDDMockito.given(this.lancamentoService.add(Mockito.any())).willReturn(obterDadosLancamento());
+		BDDMockito.given(this.funcionarioService.buscarPorId(Mockito.any())).willReturn(Optional.empty());
+		BDDMockito.given(this.lancamentoService.buscarPorId(Mockito.any())).willReturn(Optional.of(new Lancamento()));
+
+		mvc.perform(MockMvcRequestBuilders.put(URL + 3)
+				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)
+				.content(put))
+		.andDo(print())
+		.andExpect(jsonPath("$.errors").value("Funcionário não encontrado. ID inexistente."))
+		.andExpect(jsonPath("$.data").isEmpty())
+		.andExpect(status().isBadRequest());
+	}
+	
+	@Test
+	public void atualizarTest_TipoInvalido() throws Exception {
+		LancamentoDto lancamentoDto = new LancamentoDto();
+		lancamentoDto.setFuncionarioId(10L);
+		lancamentoDto.setId(null);
+		lancamentoDto.setData(this.dateFormat.format(DATA));
+		
+		ObjectMapper mapper = new ObjectMapper();
+		String put = mapper.writeValueAsString(lancamentoDto);
+		
+		BDDMockito.given(this.lancamentoService.add(Mockito.any())).willReturn(obterDadosLancamento());
+		BDDMockito.given(this.funcionarioService.buscarPorId(Mockito.any())).willReturn(Optional.of(new Funcionario()));
+		BDDMockito.given(this.lancamentoService.buscarPorId(Mockito.any())).willReturn(Optional.of(new Lancamento()));
+
+		mvc.perform(MockMvcRequestBuilders.put(URL + 3)
+				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)
+				.content(put))
+		.andDo(print())
+		.andExpect(jsonPath("$.errors").value("Tipo inválido."))
+		.andExpect(jsonPath("$.data").isEmpty())
+		.andExpect(status().isBadRequest());
+	}
+	
+	@Test
 	public void listarPorId_ExistLancamento() throws Exception {
   
 		BDDMockito.given(this.lancamentoService.buscarPorId(Mockito.anyLong()))

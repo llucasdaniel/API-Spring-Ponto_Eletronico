@@ -141,6 +141,7 @@ public class LancamentoController {
 	@PutMapping(value = "/{id}")
 	public ResponseEntity<Response<LancamentoDto>> atualizar(@PathVariable("id") Long id,
 			@Valid @RequestBody LancamentoDto lancamentoDto, BindingResult result) throws ParseException {
+		
 		log.info("Atualizando lançamento: {}", lancamentoDto.toString());
 		Response<LancamentoDto> response = new Response<LancamentoDto>();
 		validarFuncionario(lancamentoDto, result);
