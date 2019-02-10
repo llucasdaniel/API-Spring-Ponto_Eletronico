@@ -29,80 +29,79 @@ import com.lucas.pontoeletronico.api.utils.PasswordUtils;
 @CrossOrigin(origins = "*")
 public class FuncionarioController {
 
-	private static final Logger log = LoggerFactory.getLogger(FuncionarioController.class);
+    private static final Logger log = LoggerFactory.getLogger(FuncionarioController.class);
 
-	@Autowired
-	private FuncionarioService funcionarioService;
+    @Autowired
+    private FuncionarioService funcionarioService;
 
-	public FuncionarioController() {
-	}
+    public FuncionarioController() {
+    }
 
-	@PutMapping(value = "/{id}")
-	public ResponseEntity<Response<FuncionarioDto>> atualizar(@PathVariable("id") Long id,
-			@Valid @RequestBody FuncionarioDto funcionarioDto, BindingResult result) {
-		log.info("Atualizando funcionario por ID : {}", id);
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<Response<FuncionarioDto>> atualizar(@PathVariable("id") Long id,
+            @Valid @RequestBody FuncionarioDto funcionarioDto, BindingResult result) {
+        log.info("Atualizando funcionario por ID : {}", id);
 
-		Response<FuncionarioDto> response = new Response<FuncionarioDto>();
+        Response<FuncionarioDto> response = new Response<FuncionarioDto>();
 
 		Optional<Funcionario> funcionario = funcionarioService.buscarPorId(id);
 
 		if (!funcionario.isPresent()) {
-			result.addError(new ObjectError("funcionario", "Funcionario não encontrado"));
-		}
+            result.addError(new ObjectError("funcionario", "Funcionario não encontrado"));
+        }
 
 		this.atualizarDadosFuncionario(funcionario.get(), funcionarioDto, result);
 
-		if (result.hasErrors()) {
-			log.info("Erro ao validar Funcionario: {}:", result.getAllErrors());
-			result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
+        if (result.hasErrors()) {
+            log.info("Erro ao validar Funcionario: {}:", result.getAllErrors());
+            result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
 
-			return ResponseEntity.badRequest().body(response);
-		}
-		
+            return ResponseEntity.badRequest().body(response);
+        }
+
 		this.funcionarioService.add(funcionario.get());
-		
+
 		response.setData(this.converterFuncionarioDto(funcionario.get()));
-		return ResponseEntity.ok(response);
-	}
+        return ResponseEntity.ok(response);
+    }
 
-	private FuncionarioDto converterFuncionarioDto(Funcionario funcionario) {
-		FuncionarioDto funcionarioDto = new FuncionarioDto();
-		funcionarioDto.setId(funcionario.getId());
-		funcionarioDto.setEmail(funcionario.getEmail());
-		funcionarioDto.setNome(funcionario.getNome());
-		funcionario.getQtdHorasAlmocoOpt().ifPresent(
-				qtdHorasAlmoco -> funcionarioDto.setQtdHorasAlmoco(Optional.of(Float.toString(qtdHorasAlmoco))));
-		funcionario.getQtdHorasTrabalhoDiaOpt().ifPresent(
-				qtdHorasTrabDia -> funcionarioDto.setQtdHorasTrabalhoDia(Optional.of(Float.toString(qtdHorasTrabDia))));
-		funcionario.getValorHoraOpt()
-				.ifPresent(valorHora -> funcionarioDto.setValorHora(Optional.of(valorHora.toString())));
+    private FuncionarioDto converterFuncionarioDto(Funcionario funcionario) {
+        FuncionarioDto funcionarioDto = new FuncionarioDto();
+        funcionarioDto.setId(funcionario.getId());
+        funcionarioDto.setEmail(funcionario.getEmail());
+        funcionarioDto.setNome(funcionario.getNome());
+        funcionario.getQtdHorasAlmocoOpt().ifPresent(
+                qtdHorasAlmoco -> funcionarioDto.setQtdHorasAlmoco(Optional.of(Float.toString(qtdHorasAlmoco))));
+        funcionario.getQtdHorasTrabalhoDiaOpt().ifPresent(
+                qtdHorasTrabDia -> funcionarioDto.setQtdHorasTrabalhoDia(Optional.of(Float.toString(qtdHorasTrabDia))));
+        funcionario.getValorHoraOpt()
+                .ifPresent(valorHora -> funcionarioDto.setValorHora(Optional.of(valorHora.toString())));
 
-		return funcionarioDto;
-	}
+        return funcionarioDto;
+    }
 
-	private void atualizarDadosFuncionario(Funcionario funcionario, @Valid FuncionarioDto funcionarioDto,
-			BindingResult result) {
-		funcionario.setNome(funcionarioDto.getNome());
+    private void atualizarDadosFuncionario(Funcionario funcionario, @Valid FuncionarioDto funcionarioDto,
+            BindingResult result) {
+        funcionario.setNome(funcionarioDto.getNome());
 
-		if (!funcionario.getEmail().equals(funcionarioDto.getEmail())) {
-			this.funcionarioService.buscarPorEmail(funcionarioDto.getEmail())
-					.ifPresent(func -> result.addError(new ObjectError("email", "Email já existente")));
-			funcionario.setEmail(funcionarioDto.getEmail());
-		}
+        if (!funcionario.getEmail().equals(funcionarioDto.getEmail())) {
+            this.funcionarioService.buscarPorEmail(funcionarioDto.getEmail())
+                    .ifPresent(func -> result.addError(new ObjectError("email", "Email já existente")));
+            funcionario.setEmail(funcionarioDto.getEmail());
+        }
 
-		funcionario.setQtdHorasAlmoco(null);
-		funcionarioDto.getQtdHorasAlmoco().ifPresent(func -> funcionario.setQtdHorasAlmoco(Float.valueOf(func)));
-		
-		funcionario.setQtdHorasTrabalhoDia(null);
-		funcionarioDto.getQtdHorasTrabalhoDia().ifPresent(func -> funcionario.setQtdHorasTrabalhoDia(Float.valueOf(func)));
-		
-		funcionario.setValorHora(null);
-		funcionarioDto.getValorHora().ifPresent(func -> funcionario.setValorHora(new BigDecimal(func)));
+        funcionario.setQtdHorasAlmoco(null);
+        funcionarioDto.getQtdHorasAlmoco().ifPresent(func -> funcionario.setQtdHorasAlmoco(Float.valueOf(func)));
+
+        funcionario.setQtdHorasTrabalhoDia(null);
+        funcionarioDto.getQtdHorasTrabalhoDia().ifPresent(func -> funcionario.setQtdHorasTrabalhoDia(Float.valueOf(func)));
+
+        funcionario.setValorHora(null);
+        funcionarioDto.getValorHora().ifPresent(func -> funcionario.setValorHora(new BigDecimal(func)));
 
 		if(funcionarioDto.getSenha().isPresent()) {
-			funcionario.setSenha(PasswordUtils.generateBCrypt(funcionarioDto.getSenha().get()));
-		}
-	}
-
+            funcionario.setSenha(PasswordUtils.generateBCrypt(funcionarioDto.getSenha().get()));
+        }
+    }
 
 }

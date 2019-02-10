@@ -27,7 +27,6 @@ import com.lucas.pontoeletronico.api.services.EmpresaService;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@WithMockUser
 public class EmpresaControllerTest {
 	
 	@Autowired
@@ -42,6 +41,7 @@ public class EmpresaControllerTest {
 	private static final String RAZAO_SOCIAL  = "Lucas LTDA";
 	
 	@Test
+        @WithMockUser
 	public void buscarPorCnpjTest_EmpresaCnpjInvalid() throws Exception{
 		 BDDMockito.given(this.empresaService.buscarPorCnpj(Mockito.anyString())).willReturn(Optional.empty());
 		 mvc.perform(MockMvcRequestBuilders.get(ROUTE_EMPRESA_CNPJ_URL + CNPJ).accept(MediaType.APPLICATION_JSON))
@@ -50,6 +50,7 @@ public class EmpresaControllerTest {
 	}	
 	
 	@Test
+        @WithMockUser
 	public void converterCadastroPFDtoTest_OptionalNOTPresent() throws Exception {
 		BDDMockito.given(this.empresaService.buscarPorCnpj(Mockito.anyString()))
 			.willReturn(Optional.of(this.obterDadosEmpresa()));
