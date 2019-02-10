@@ -35,6 +35,7 @@ import com.lucas.pontoeletronico.api.entities.Lancamento;
 import com.lucas.pontoeletronico.api.enums.TipoEnum;
 import com.lucas.pontoeletronico.api.services.FuncionarioService;
 import com.lucas.pontoeletronico.api.services.LancamentoService;
+import static org.mockito.Mockito.never;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -246,6 +247,7 @@ public class LancamentoControllerTest {
     }
 
     @Test
+    @WithMockUser
     public void addLancamentosFuncionarioIdInvalido() throws JsonProcessingException, Exception {
         BDDMockito.given(this.funcionarioService.buscarPorId(Mockito.anyLong())).willReturn(Optional.empty());
 
@@ -257,17 +259,30 @@ public class LancamentoControllerTest {
         BDDMockito.verify(this.funcionarioService, times(1)).buscarPorId(Mockito.anyLong());
     }
 
-//    @Test
-//    public void testRemoveLancamento() throws Exception {
-//        BDDMockito.given(this.lancamentoService.buscarPorId(ID_LANCAMENTO)).willReturn(new Lancamento());
-//        BDDMockito.willDoNothing().given(this.lancamentoService).remove(ID_LANCAMENTO);
-//
-//        mvc.perform(MockMvcRequestBuilders.delete(URL + ID_LANCAMENTO).accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk());
-//
-//        BDDMockito.verify(this.lancamentoService, times(1)).buscarPorId(ID_LANCAMENTO);
-//        BDDMockito.verify(this.lancamentoService, times(1)).remove(ID_LANCAMENTO);
-//    }
+    @Test
+    @WithMockUser(username="admin@admin.com",roles={"ADMIN"})
+    public void testRemoveLancamento() throws Exception {
+        BDDMockito.given(this.lancamentoService.buscarPorId(ID_LANCAMENTO)).willReturn(Optional.of(new Lancamento()));
+        BDDMockito.willDoNothing().given(this.lancamentoService).remove(ID_LANCAMENTO);
+
+        mvc.perform(MockMvcRequestBuilders.delete(URL + ID_LANCAMENTO).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        BDDMockito.verify(this.lancamentoService, times(1)).buscarPorId(ID_LANCAMENTO);
+        BDDMockito.verify(this.lancamentoService, times(1)).remove(ID_LANCAMENTO);
+    }
+    
+     @Test    
+    public void testRemoveLancamentoWithoutAccess() throws Exception {
+
+        mvc.perform(MockMvcRequestBuilders.delete(URL + ID_LANCAMENTO).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+
+        BDDMockito.verify(this.lancamentoService, never()).buscarPorId(ID_LANCAMENTO);
+        BDDMockito.verify(this.lancamentoService, never()).remove(ID_LANCAMENTO);
+    }
+    
+    
     private String obterJsonRequisicaoPost() throws JsonProcessingException {
         LancamentoDto lancamentoDto = new LancamentoDto();
         lancamentoDto.setId(null);
