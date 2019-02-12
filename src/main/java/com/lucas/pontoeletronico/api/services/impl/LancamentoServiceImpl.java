@@ -11,6 +11,8 @@ import com.lucas.pontoeletronico.api.entities.Lancamento;
 import com.lucas.pontoeletronico.api.repositories.LancamentoRepository;
 import com.lucas.pontoeletronico.api.services.LancamentoService;
 import java.util.Optional;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 
 @Service
 public class LancamentoServiceImpl implements LancamentoService {
@@ -27,12 +29,14 @@ public class LancamentoServiceImpl implements LancamentoService {
     }
 
     @Override
+    @Cacheable("lancamentoPorId")
     public Optional<Lancamento> buscarPorId(Long id) {
         log.info("Find Lancamento By ID");
         return lancamentoRepository.findById(id);
     }
 
     @Override
+    @CachePut("lancamentoPorId") //Update  cache if Lancamento is updated
     public Lancamento add(Lancamento func) {
         log.info("Adding Lancamento = " + func.getDescricao());
         return lancamentoRepository.save(func);
